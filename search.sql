@@ -10,16 +10,16 @@ select distinct professor_id, number_of_class from studying_proccess where subje
 
 -- Получить  номера предметов и названия предметов, которые ведет преподаватель Костин.
 select distinct subject_number, title from subject 
-inner join studying_proccess
-on studying_proccess.subject_id = subject.subject_number
-inner join professor
-on professor.professors_number = studying_proccess.professors_id
+	inner join studying_proccess
+		on studying_proccess.subject_id = subject.subject_number
+		inner join professor
+			on professor.professors_number = studying_proccess.professors_id
 where professor.surname = 'Костин';
 
 -- Получить номер группы, в которой ведутся предметы преподавателем Фроловым.
 select distinct group_id from studying_proccess
-inner join professor
-on professor.professors_number = studying_proccess.professors_id
+	inner join professor
+		on professor.professors_number = studying_proccess.professors_id
 where professor.surname = 'Фролов';
 
 -- Получить информацию о предметах, которые ведутся на специальности АСОИ.
@@ -30,24 +30,43 @@ select distinct * from professor where speciality like '%АСОИ%';
 
 -- Получить фамилии преподавателей, которые ведут предметы в 210 аудитории.
 select distinct surname from professor 
-inner join studying_proccess
-on studying_proccess.professors_id = professor.professors_number
+	inner join studying_proccess
+		on studying_proccess.professors_id = professor.professors_number
 where studying_proccess.number_of_class= 210;
 
 -- Получить названия предметов и названия групп, которые ведут занятия в аудиториях с 100 по 200. 
 select distinct subject.title as 'subject_name', student_group.title as 'group_name' from studying_proccess
-inner join subject
-on  subject.subject_number = studying_proccess.subject_id
-inner join  student_group
-on student_group.group_number = studying_proccess.group_id
+	inner join subject
+		on  subject.subject_number = studying_proccess.subject_id
+		inner join  student_group
+			on student_group.group_number = studying_proccess.group_id
 where number_of_class between 100 and 200;
 
 -- Получить пары номеров групп с одной специальности.
 
+
+
+
+
+
+
+
+
 -- Получить общее количество студентов, обучающихся на специальности ЭВМ.
+select sum(student_group.number_of_students) from student_group where speciality = 'ЭВМ';
+
 -- Получить номера преподавателей, обучающих студентов по специальности ЭВМ.
+select distinct professors_number from professor where speciality like '%ЭВМ%';
+
 -- Получить номера предметов, изучаемых всеми студенческими группами.
+select distinct subject_id from studying_proccess
+group by subject_id
+having count(group_id) = (select count(*) from student_group ) ;
+
 -- Получить фамилии преподавателей, преподающих те же предметы, что и преподаватель преподающий предмет с номером 14П.
+
+
+
 -- Получить информацию о предметах, которые не ведет преподаватель с личным номером 221П.
 -- Получить информацию о предметах, которые не изучаются в группе М-6.
 -- Получить информацию о доцентах, преподающих в группах 3Г и 8Г.
