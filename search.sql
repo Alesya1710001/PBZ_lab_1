@@ -43,15 +43,11 @@ select distinct subject.title as 'subject_name', student_group.title as 'group_n
 where number_of_class between 100 and 200;
 
 -- Получить пары номеров групп с одной специальности.
-
-
-
-
-
-
-
-
-
+select distinct student_group1.group_number as first,student_group2.group_number as second from student_group as student_group1
+	inner join student_group as student_group2
+		on student_group1.group_number != student_group2.group_number
+where student_group1.speciality = student_group2.speciality and student_group1.group_number < student_group2.group_number;
+	
 -- Получить общее количество студентов, обучающихся на специальности ЭВМ.
 select sum(student_group.number_of_students) from student_group where speciality = 'ЭВМ';
 
@@ -64,16 +60,16 @@ group by subject_id
 having count(group_id) = (select count(*) from student_group ) ;
 
 -- Получить фамилии преподавателей, преподающих те же предметы, что и преподаватель преподающий предмет с номером 14П.
-
-
-
-
-
-
-
-
-
-
+select distinct surname  from professor
+	inner join studying_proccess
+		on studying_proccess.professors_id = professor.professors_number
+where subject_id in (
+	select distinct subject_id from studying_proccess
+	where professors_id in (
+		select distinct professors_id from studying_proccess
+		where subject_id = '14П'
+	)
+);
 
 -- Получить информацию о предметах, которые не ведет преподаватель с личным номером 221П.
 select distinct subject_number, title, number_of_hours, speciality, semester from subject
@@ -129,7 +125,33 @@ select distinct subject_id from studying_proccess
 where student_group.title = 'АС-8';
 
 -- Получить номера студенческих групп, которые изучают те же предметы, что и студенческая группа АС-8.
+select distinct group_id  from studying_proccess
+	inner join student_group
+		on student_group.group_number = studying_proccess.group_id
+where subject_id in (
+	select distinct subject_id from studying_proccess 
+	where student_group.title = 'АС-8'
+) ;
 
 -- Получить номера студенческих групп, которые не изучают предметы, преподаваемых в студенческой группе АС-8.
+select distinct group_id  from studying_proccess
+	inner join student_group
+		on student_group.group_number = studying_proccess.group_id
+where subject_id not in (
+	select distinct subject_id from studying_proccess 
+		where student_group.title = 'АС-8'
+) ;
+
+
 -- Получить номера студенческих групп, которые не изучают предметы, преподаваемых преподавателем 430Л.
+select distinct group_id  from studying_proccess
+where group_id not in (
+	select distinct group_id from studying_proccess 
+		where studying_proccess.professors_id = '430Л'
+) ;
+
 -- Получить номера преподавателей, работающих с группой Э-15, но не преподающих предмет 12П.
+select distinct professors_id from studying_proccess
+	inner join student_group
+		on student_group.group_number = studying_proccess.group_id
+where student_group.title = 'Э-15' and studying_proccess.subject_id != '12П';
